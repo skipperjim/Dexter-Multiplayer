@@ -8,5 +8,5 @@ done
 timestamp=`date +'%Y-%m-%d_%H.%M.%S'`
 mv /var/www/html/dexter /var/www/backups/${a}_dexter_bak_${timestamp}
 cp -R /home/steven/workspace/Dexter /var/www/html/dexter && echo "Copy complete."
-ls /var/www/backups/
+#ls /var/www/backups/
 chmod -R o+r /var/www/html/dexter/assets/images/dexter/
