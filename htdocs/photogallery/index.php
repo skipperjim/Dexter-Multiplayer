@@ -42,17 +42,20 @@
         echo "</p></center>";
         // output data of each row
         $i = 1;
+        echo "<div id='MainContainer' class='outerContainer' style='width:100%; margin:0 auto;'>";
+        echo "<center><div class='innerContainer'><img id='PrevArrow' src='http://127.0.0.1/dexter/assets/images/icons/arrow_sideways/Arrow-icon-128.png' /></div>";
         while($row = $result->fetch_assoc()) {
             //echo "id: " . $row["id"]. " - Name: " . $row["file_name"]. " " . $row["path"]. "<br>";
             if($i == 1){
-                echo "<div id='ImageDiv_${row['id']}' class='photoframe' num='${row['id']}' style='margin:0 auto;'><center>";
+                echo "<div id='ImageDiv_${row['id']}' class='photoframe' num='${row['id']}' style='margin:0 auto;'>";
             }else{
-                echo "<div id='ImageDiv_${row['id']}' class='photoframe' num='${row['id']}' style='display:none;'><center>";
+                echo "<div id='ImageDiv_${row['id']}' class='photoframe' num='${row['id']}' style='display:none;'>";
             }
             echo "<img id='Image_${row['id']}' src='http://127.0.0.1/dexter/${row['path']}/${row['file_name']}' alt='Dexter!!' style='display: inline-block;' width='270px' height='480'>";
-            echo "</center></div>";
+            echo "</div>";
             $i++;
         }
+        echo "<div class='innerContainer'><img id='NextArrow' src='http://127.0.0.1/dexter/assets/images/icons/arrow_sideways/Arrow-icon-128.png' /></div></center>";
     } else {
         echo "0 results.";
     }
@@ -81,12 +84,10 @@ jQuery(document).ready(function(){
 });
 
 function navigateImages(direction){
-    console.log("Going to "+direction+".");
     var currImgEle = jQuery("div.photoframe:visible");
     var currNum = parseInt(currImgEle.attr("num"));
     var nextNum = (currNum+1);
     var prevNum = (currNum-1);
-    console.log("Current Image # is: "+currNum+". Next # is: "+nextNum+". Previous # is: "+prevNum+".");
     if(direction === "PrevImg"){
         var viewImgEle = jQuery("div#ImageDiv_"+prevNum+":hidden");
     }else if(direction === "NextImg"){
@@ -103,8 +104,24 @@ body {
     margin: 0 auto;
     background-color: gray;
 }
+div.photoframe, div.innerContainer {
+    display: inline-block;
+}
 a#PrevImg, a#NextImg {
     text-decoration: none;
+}
+img#NextArrow {
+    /* Rotate div */
+    -ms-transform: rotate(180deg); /* IE 9 */
+    -webkit-transform: rotate(180deg); /* Chrome, Safari, Opera */
+    transform: rotate(180deg);
+}
+div.innerContainer {
+    vertical-align: top;
+    height: 100%;
+}
+img#PrevArrow, img#NextArrow {
+    vertical-align: middle;
 }
 .stitched {
     padding: 20px;
