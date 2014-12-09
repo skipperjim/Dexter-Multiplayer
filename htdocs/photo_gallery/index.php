@@ -22,7 +22,7 @@
     <?php
     $servername = "localhost";
     $username = "root";
-    $password = "42Baseball";
+    $password = "root";
     $dbname = "dexter";
 
     // Create connection
@@ -32,7 +32,7 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
-    $sql = "SELECT id, file_name, path FROM photos";
+    $sql = "SELECT id, file_name, group_id, path, description FROM photos";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
@@ -43,7 +43,7 @@
         // output data of each row
         $i = 1;
         echo "<div id='MainContainer' class='outerContainer' style='width:100%; margin:0 auto;'>";
-        echo "<center><div class='innerContainer'><img id='PrevArrow' src='http://127.0.0.1/dexter/assets/images/icons/arrow_sideways/Arrow-icon-128.png' /></div>";
+        echo "<center><div class='innerContainer'><img id='PrevArrow' src='http://dexter.localhost/media/icons/arrow_sideways/Arrow-icon-128.png' /></div>";
         while($row = $result->fetch_assoc()) {
             //echo "id: " . $row["id"]. " - Name: " . $row["file_name"]. " " . $row["path"]. "<br>";
             if($i == 1){
@@ -51,11 +51,11 @@
             }else{
                 echo "<div id='ImageDiv_${row['id']}' class='photoframe' num='${row['id']}' style='display:none;'>";
             }
-            echo "<img id='Image_${row['id']}' src='http://127.0.0.1/dexter/${row['path']}/${row['file_name']}' alt='Dexter!!' style='display: inline-block;' width='270px' height='480'>";
+            echo "<img id='Image_${row['id']}' src='http://dexter.localhost/${row['path']}/${row['file_name']}' alt='Dexter!!' style='display: inline-block;' width='270px' height='480'>";
             echo "</div>";
             $i++;
         }
-        echo "<div class='innerContainer'><img id='NextArrow' src='http://127.0.0.1/dexter/assets/images/icons/arrow_sideways/Arrow-icon-128.png' /></div></center>";
+        echo "<div class='innerContainer'><img id='NextArrow' src='http://dexter.localhost/media/icons/arrow_sideways/Arrow-icon-128.png' /></div></center>";
     } else {
         echo "0 results.";
     }
