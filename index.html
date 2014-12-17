@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<script src="http://dexter.localhost:3700/socket.io/socket.io.js"></script>
 	<title>Dexter's Interactive Website</title>
 	<style type="text/css">
 		html,body {
@@ -22,14 +23,16 @@
 		}
 	</style>
 
-	<script type="text/javascript" src="game.min.js"></script>
+	<!-- <script type="text/javascript" src="game.min.js"></script> -->
+	<script src="lib/impact/impact.js"></script>
+	<script src="lib/game/main.js"></script>
+	<script src="assets/js/jquery-2.1.1.min.js"></script>
 </head>
+
 <body>
-<div id="PhotoAlbumLinkDiv" class="stitched" style="width:175px; text-align:center;">
-	<a href="http://dexter.localhost/htdocs/photo_gallery/" style="text-decoration:none;">GoTo Dexter's<br/>Photo Album</a>
-</div>
 	<canvas id="canvas"></canvas>
 </body>
+
 </html>
 
 <style>
@@ -48,3 +51,133 @@
     font-weight: normal;
 }
 </style>
+
+<script>
+var playernum = Math.floor(Math.random()*100);
+var playername = "Player"+playernum;
+
+console.log(playername);
+
+var socket = io.connect('http://dexter.localhost:3700');
+
+socket.on('disconnect', function(data){
+	var player = ig.game.getEntitiesByType(EntityPlayer)[0];
+	if(player){
+		player.messagebox = player.messagebox + '\n' + data + ' disconnected';
+	}
+});
+
+socket.on('message', function(data){
+	var player = ig.game.getEntitiesByType(EntityPlayer)[0];
+	if(player){
+		player.messagebox = player.messagebox + '\n' + data + ' disconnected.';
+	}
+});
+
+socket.on('playermove', function(destinationx, destinationy, thisgamename){
+	var otherplayer = ig.game.getEntitiesByType(EntityOtherPlayer);
+	if(otherplayer){
+		for(var i in otherplayer){
+			if(thisgamename == otherplayer[i].gamename){
+				otherplayer[i].destinationx = destinationx;
+				otherplayer[i].destinationy = destinationy;
+			}
+		}
+	}
+});
+
+socket.on('syncplayer', function(playerx, playery, thisgamename){
+	var otherplayer = ig.game.getEntitiesByType(EntityOtherPlayer);
+	if(otherplayer){
+		for(var i in otherplayer){
+			if(thisgamename == otherplayer[i].gamename){
+				otherplayer[i].pos.x = playerx;
+				otherplayer[i].pos.y = playery;
+			}
+		}
+	}
+});
+
+socket.on('playerattacked', function(direction, xadd, yadd, attackangle, thisgamename){
+	var otherplayer = ig.game.getEntitiesByType(EntityOtherPlayer);
+	if(otherplayer){
+		for(var i in otherplayer){
+			if(thisgamename == otherplayer[i].gamename){
+				ig.game.spawnEntity(EntitySword, otherplayer[i].pos.x, otherplayer[i].pos.y, {thisangle:attackangle, xadd:xadd, yadd:yadd, ownername:otherplayer[i].gamename});
+			}
+		}
+	}
+});
+
+socket.on('netreplayer', function(playerlist){
+	var netplayers = ig.game.getEntitiesByType(EntityOtherPlayer);
+	// Loop to see if other players exist
+	if(netplayers){
+		for(var i in netplayers){
+			netplayers[i].kill();
+		}
+	}
+	for(var i in playerlist){
+		if(playername != playerList[i]){
+			ig.game.spawnEntity(EntityOtherPlayer, 160, 260, {gamename:playerlist[i]});
+		}
+	}
+});
+
+socket.on('addplayer', function(playerlist, otherplayername, playerx, playery){
+	console.log("AddPlayer");
+	console.log(playerlist);
+	var player = ig.game.getEntitiesByType(EntityPlayer)[0];
+	player.messagebox = player.messagebox + '\n' + otherplayername + ' has joined the game.';
+	for(var i = 0; i < playerlist.length; i++){
+		if(player.gamename != playerlist[i]){
+			ig.game.spawnEntity(EntityOtherPlayer, playerx, playery, {gamename:playerlist[i]});
+		}
+	}
+});
+
+socket.on('killplayer', function(otherplayername){
+	var netplayers = ig.game.getEntitiesByType(EntityOtherPlayer);
+	for(var i in netplayers){
+		if(otherplayername == netplayers[i].gamename){
+			netplayers[i].kill();
+		}
+	}
+});
+
+socket.on('spawncreature', function(spawnx, spawny, creaturename){
+	ig.game.spawnEntity(EntityAxilict, spawnx, spawny, {gamename:creaturename});
+});
+
+socket.on('resynccreatures', function(){
+	var creatures = ig.game.getEntitiesByType(EntityAxilict);
+	for(var i = 0; i < creatures.length; i++){
+		// TODO
+	}
+	socket.emit('syncdcreatures', creatures);
+});
+
+socket.on('creaturemove', function(creaturelist){
+	var creatures = ig.game.getEntitiesByType(EntityAxilict);
+	for(var i = 0; i < creatures.length; i++){
+		for(var i = 0; i < creaturelist.length; i++){
+			if(creatures[i].gamename == creaturelist[i].name){
+				creatures[i].vel.x = creaturelist[i].velx;
+				creatures[i].vel.y = creaturelist[i].vely;
+			}
+		}
+	}
+});
+
+socket.on('spawnclientbullet', function(weapontype, gamename, animangle){
+	var netplayers = ig.game.getEntitiesByType(EntityOtherPlayer);
+	if(netplayers){
+		for(var i =0; i < netplayers.length; i++){
+			if(netplayers[i].gamename == gamename){
+				ig.game.spawnEntity(EntityNetBullet, netplayers[i].pos.x + 30, netplayers[i].pos.y + 30, {bullettype: weapontype, animangle: animangle});
+			}
+		}
+	}
+});
+
+</script>

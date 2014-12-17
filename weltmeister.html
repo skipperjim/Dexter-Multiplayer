@@ -8,6 +8,7 @@
 	<script src="lib/weltmeister/jquery-ui-1.8.1.custom.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="lib/impact/impact.js" type="text/javascript" charset="utf-8"></script>
 	<script src="lib/weltmeister/weltmeister.js" type="text/javascript" charset="utf-8"></script>
+	<script src="http://dexter.localhost:3700/socket.io/socket.io.js"></script>
 </head>
 <body>
 <div id="headerMenu">
@@ -94,5 +95,16 @@
 	<div id="zoomIndicator">1x</div>
 	
 </div>
+
+<script>
+var playernum = Math.floor(Math.random()*100);
+var playername = "Player"+playernum;
+console.log("weltmeister: "+playername);
+var socket = io.connect('http://dexter.localhost:3700');
+socket.on('connect', function(data){
+	console.log("connected to welt");
+});
+</script>
+
 </body>
 </html>
